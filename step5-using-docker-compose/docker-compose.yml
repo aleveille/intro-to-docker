@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  redis:
+    container_name: step5-redis-container
+    image: redis
+    ports:
+     - "6379:6379"
+
+  step5-nodejs:
+    container_name: step5-nodejs-container
+    image: step4-nodejs-image
+    ports:
+     - "8000:8000"
+    depends_on:
+     - redis
