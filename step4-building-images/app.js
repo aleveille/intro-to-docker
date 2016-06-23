@@ -1,30 +1,24 @@
-// shamelessly grabbed from http://anandmanisankar.com/posts/docker-container-nginx-node-redis-example/
-// thanks Anand Mani Sankar
+// Shamelessly grabbed from https://howtonode.org/hello-node
+// Refactored with inspiration from http://anandmanisankar.com/posts/docker-container-nginx-node-redis-example/
 
-var express = require('express'),
-    http = require('http'),
+// Load the http module to create an http server.
+var http = require('http'),
     redis = require('redis');
 
-var app = express();
-
-// APPROACH 1: Using environment variables created by Docker
-// var client = redis.createClient(
-//      process.env.REDIS_PORT_6379_TCP_PORT,
-//      process.env.REDIS_PORT_6379_TCP_ADDR
-// );
-// console.log(process.env.REDIS_PORT_6379_TCP_ADDR + ':' + process.env.REDIS_PORT_6379_TCP_PORT);
-
-// APPROACH 2: Using host entries created by Docker in /etc/hosts (RECOMMENDED)
 var client = redis.createClient('6379', 'redis');
 
-
-app.get('/', function(req, res, next) {
+// Configure our HTTP server to query Redis and return an incremental count
+var server = http.createServer(function (request, response) {
+  response.writeHead(200, {"Content-Type": "text/plain"});
+  //response.end("Hello World\n");
   client.incr('counter', function(err, counter) {
     if(err) return next(err);
-    res.send('This page has been viewed ' + counter + ' times!');
+    response.end('This page has been viewed ' + counter + ' times!');
   });
 });
 
-http.createServer(app).listen(process.env.PORT || 8000, function() {
-  console.log('Listening on port ' + (process.env.PORT || 8000));
-});
+// Listen on port 8000, IP defaults to 127.0.0.1
+server.listen(8000);
+
+// Put a friendly message on the terminal
+console.log("Server running at http://127.0.0.1:8000/");
