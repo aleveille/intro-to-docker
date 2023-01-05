@@ -1,6 +1,6 @@
-FROM node:6.0
+FROM node:19
 
-MAINTAINER Alexandre Leveille <alexandre.leveille@workjam.com>
+LABEL Maintainer="Alexandre Leveille <info@aleveille.me>"
 
 WORKDIR /usr/src/app
 

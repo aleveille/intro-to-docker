@@ -13,7 +13,6 @@ docker run -d \
 	-p 6379:6379 \
 	redis
 
-
 printf "\n${yel}Running:\ndocker build -t step4-nodejs-image .${end}\n"
 docker build -t step4-nodejs-image .
 
