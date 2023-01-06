@@ -204,14 +204,19 @@ const client = redis.createClient({
     });
 client.on('error', (err) => console.log('Redis error:', err));
 
+
+async function incr() {
+  const counter = await client.get('counter');
+  await client.set('counter', parseInt(counter) + 1);
+  return counter;
+}
+
 const server = http.createServer()
 server.on('request', async (req, res) => {
   res.writeHead(200, {"Content-Type": "text/plain"});
   
-  await client.incr('counter', function(err, counter) {
-    if(err) return next(err);
-    res.end('This page has been viewed ' + counter + ' times!');
-  });
+  const counter = await incr();
+  res.end('This page has been viewed ' + counter + ' times!');
 });
 
 async function start() {
@@ -231,7 +236,7 @@ start();
 
 As you can see, we added one dependency: `require('redis')` node module. Because of this, you'll need to install the NPM dependency. If you are unsure why, you can just copy the package.json file and node_modules folder from the step3-adding-redis folder in the repo at the same location as app.js.
 
-We then create a Redis client and the createServer method changed a little bit to query the back-end and return an incrementing counter. Notice how the createClient(port, host) code is connecting to a server named redis on port 6379.
+We then changed the code to some async functions in order to grab and increment the counter value in redis.
 
 In Docker, there're a few ways to have your nodes talk to one another. Normally, you would probably have a network between the two containers, but I'll take another route (no pun intended) in order to show another feature.
 
@@ -256,10 +261,7 @@ docker run -d \
     node app.js
 ```
 
-    --add-host="redis:${REDIS_IP}" \
-    --link step3-redis-container:redis \
-
-In the docker run command above, we simply added the --add-host="redis:${REDIS_IP}" option. The part ${REDIS_IP} will be replaced as you run the command with the value you exported earlier, so the container's hostfile will contain something like "redis".
+In the docker run command above, we simply added the `--add-host="redis:${REDIS_IP}"` option. The part ${REDIS_IP} will be replaced as you run the command with the value you exported earlier, so the container's hostfile will contain something like "redis".
 
 As before, you can access the server at [http://localhost:8000/](http://localhost:8000/) or [http://your-IP:8000/](http://your-IP:8000/). If you are unsure what "your-IP" is, you can just try the following (macOS):
 
@@ -288,7 +290,7 @@ ff02::2 ip6-allrouters
 
 To close on this networking aside, this super pretty table should give you an idea how the step3-nodejs-container uses the Mac IP to exits the container and then your mac will redirect the traffic for port 6379 into step3-redis-container.
 
-```shell
+```raw
 +---Listens: 6379 & 8000 -------------------+
 | Mac: 192.168.41.50                        |
 |                                           |
@@ -323,7 +325,7 @@ We'll start by creating a file named `Dockerfile` (no extension) add this conten
 ```dockerfile
 FROM node:current
 
-MAINTAINER Alexandre Leveille <alexandre.leveille@workjam.com>
+LABEL Maintainer="Alexandre Leveille <info@aleveille.me>"
 
 WORKDIR /usr/src/app
 
@@ -455,8 +457,9 @@ open http://$(ipconfig getifaddr en0):8000
 ```
 
 Once you are done, stop and remove the containers by typing:
-```
+
+```shell
 docker-compose down
 ```
 
-# Thanks!
+## Thank you
