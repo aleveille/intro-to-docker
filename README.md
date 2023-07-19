@@ -1,3 +1,7 @@
+***This repos is now archived***
+
+***When I wrote this guide, 8 years ago, Docker was a relatively new product and not that many guides out there were available. Nowadays, there are hundreds if not thousands of guides available.***
+
 # Welcome
 
 This hands-on guide assumes that you've already read or heard about Docker and are ready to try it out. This guide is intended for complete beginners and will, therefore, explain every command that is being run and the options used.
